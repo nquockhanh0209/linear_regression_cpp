@@ -3,37 +3,36 @@
 #include <numeric>
 #include "fileHandler.cpp"
 #include "vectorUtilities.cpp"
-
 using namespace std;
-float dot_product(const std::vector<std::vector<int>> &e, const std::vector<int> &p)
-{
-    float result = 0;
-    for (auto &v : e) // range based loop
-        result += std::inner_product(v.begin(), v.end(), p.begin(), 0.0);
-    return result;
-}
 int main()
 {
     FileHandler fileHandler;
     VectorUtilities vectorUtilities;
     //each row of inout file converted as a vector
     
-    std::vector<std::vector<float>> xInput = fileHandler.convertDataToNumber<float>("x_input.txt");
-    std::vector<std::vector<float>> yInput = fileHandler.convertDataToNumber<float>("y_input.txt");
-    std::vector<float> x = xInput.at(0);
-    std::vector<float> y = yInput.at(0);
+    std::vector<std::vector<double>> xInput = fileHandler.convertDataToNumber<double>("x_input.txt");
+    std::vector<std::vector<double>> yInput = fileHandler.convertDataToNumber<double>("y_input.txt");
+    std::vector<double> x = xInput.at(0);
+    std::vector<double> y = yInput.at(0);
+    // need to add vector 1 to X as bias 
+    vector<double> vectorOne = vector<double>(xInput[0].size(), 1.0);
+    xInput.push_back(vectorOne);
 
-    std::vector<std::vector<float>> xInputTranspose = vectorUtilities.transposeToColumnVector(x);
-    std::vector<std::vector<float>> A = vectorUtilities.multiplyMatrices(xInputTranspose, xInput);
-    cout<<A[0][0]<<endl;
-    // std::vector<std::vector<float>> AInverse = vectorUtilities.invertMatrix(A);
-// std::vector<std::vector<float>> b = vectorUtilities.multiplyMatrices(xInputTranspose, yInput);
-// std::vector<std::vector<float>> w = vectorUtilities.multiplyMatrices(AInverse, b);
+    //input vector of x and y should be at coulumn vector format
+    std::vector<std::vector<double>> yInputTranspose = vectorUtilities.transpose(yInput);
+    std::vector<std::vector<double>> xInputTranspose = vectorUtilities.transpose(xInput);
 
-    for(std::vector<float> i : A){
-        for (float j : i){
-            cout<<j<<endl;
+    //handle create A and b
+    std::vector<std::vector<double>> A = vectorUtilities.multiplyMatrices(xInput, xInputTranspose);
+    std::vector<std::vector<double>> AInverse = vectorUtilities.invertMatrix(A);
+std::vector<std::vector<double>> b = vectorUtilities.multiplyMatrices(xInput, yInputTranspose);
+std::vector<std::vector<double>> w = vectorUtilities.multiplyMatrices(AInverse, b);
+
+    for(std::vector<double> i : w){
+        for (double j : i){
+            cout<<j<<",";
         }
+        cout<<endl;
     }
 
     
