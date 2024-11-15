@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "stringUtilities.cpp"
+using namespace std;
 class FileHandler {
     private:
         StringUtilities stringUtilities;
@@ -40,7 +41,7 @@ class FileHandler {
                     std::vector<T> resultLine;
 
                     for(int i = 0; i<dataIndex.size(); i++){
-                        resultLine.push_back(std::stoi(dataIndex.at(i)));
+                        resultLine.push_back(std::stod(dataIndex.at(i)));
                     }
                     result.push_back(resultLine);
                 }
