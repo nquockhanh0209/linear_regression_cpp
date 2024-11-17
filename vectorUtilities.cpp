@@ -1,6 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <random>
 using namespace std;
 class VectorUtilities
 {
@@ -94,7 +95,7 @@ public:
         for (int i = 0; i < n; i++)
         {
             T pivot = matrix[i][i];
-            cout<<"pivot "<<pivot<<endl;
+            cout << "pivot " << pivot << endl;
             if (pivot == 0)
             {
                 cerr << "vector<vector<double>> is singular and cannot be inverted." << endl;
@@ -122,4 +123,81 @@ public:
         }
         return inverse;
     }
+    template <typename T>
+    // Function to perform Cholesky decomposition
+    bool cholesky_decomposition(const vector<vector<T>> &cov, vector<vector<T>> &L)
+    {
+        int d = cov.size();
+        L = vector<vector<T>>(d, vector<T>(d, 0.0));
+
+        for (int i = 0; i < d; ++i)
+        {
+            for (int j = 0; j <= i; ++j)
+            {
+                T sum = cov[i][j];
+                for (int k = 0; k < j; ++k)
+                {
+                    sum -= L[i][k] * L[j][k];
+                }
+                if (i == j)
+                {
+                    if (sum <= 0)
+                        return false; // Not positive definite
+                    L[i][j] = sqrt(sum);
+                }
+                else
+                {
+                    L[i][j] = sum / L[j][j];
+                }
+            }
+        }
+        return true;
+    }
+    template <typename T>
+    // Function to generate samples from a multivariate normal distribution
+    vector<vector<T>> generate_multivariate_normal(const vector<T> &mean, const vector<vector<T>> &cov, int sample_size)
+    {
+        int d = mean.size(); // dimensionality of the distribution
+        vector<vector<T>> samples;
+
+        // Cholesky decomposition of the covariance matrix
+        vector<vector<T>> L;
+        if (!cholesky_decomposition(cov, L))
+        {
+            cerr << "Error: Covariance matrix is not positive definite!" << endl;
+            return samples; // Return empty vector if decomposition fails
+        }
+
+        // Random number generator
+        random_device rd;
+        mt19937 gen(rd());
+        normal_distribution<> dist(0.0, 1.0); // standard normal distribution
+
+        // Generate samples
+        for (int i = 0; i < sample_size; ++i)
+        {
+            // Generate standard normal random vector
+            vector<T> z(d);
+            for (int j = 0; j < d; ++j)
+            {
+                z[j] = dist(gen);
+            }
+
+            // Transform to the desired distribution
+            vector<T> sample(d, 0.0);
+            for (int j = 0; j < d; ++j)
+            {
+                sample[j] = mean[j];
+                for (int k = 0; k < d; ++k)
+                {
+                    sample[j] += L[j][k] * z[k];
+                }
+            }
+            samples.push_back(sample);
+        }
+
+        return samples;
+    }
+
+    
 };
