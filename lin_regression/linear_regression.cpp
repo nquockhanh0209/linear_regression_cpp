@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <numeric>
-#include "fileHandler.cpp"
-#include "vectorUtilities.cpp"
+#include "utils/fileHandler.cpp"
+#include "utils/vectorUtilities.cpp"
 using namespace std;
 int main()
 {
