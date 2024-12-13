@@ -56,42 +56,25 @@ public:
         assert("Data empty!");
     }
 
-    void handleReadCsv(std::string fileName)
+    map<std::string, std::vector<std::string>> handleCSV(FileHandler fileHandler, StringUtilities stringUtilities, std::string fileName)
     {
-        // Specify the CSV file path
-        std::string filename = fileName;
+        map<std::string, std::vector<std::string>> csvData;
 
-        // Open the file
-        std::ifstream file(filename);
-        if (!file.is_open())
+        std::vector<std::string> data = handleReadFile(fileName);
+        std::string keysString = data[0];
+        std::vector<std::string> keys = stringUtilities.tokenize(keysString, ",");
+        for (int i = 1; i < data.size(); i++)
         {
-            std::cerr << "Error: Could not open file " << filename << std::endl;
-        }
-
-        // Read the file line by line
-        std::string line;
-        while (std::getline(file, line))
-        {
-            std::vector<std::string> row; // To store individual fields in a row
-
-            // Parse the line using a stringstream
-            std::stringstream ss(line);
-            std::string field;
-            while (std::getline(ss, field, ','))
-            {                         // Assuming CSV uses ',' as a delimiter
-                row.push_back(field); // Add each field to the row vector
-            }
-
-            // Process the row
-            for (const auto &item : row)
+            std::vector<std::string> line = stringUtilities.tokenize(data[i], ",");
+            for (int j = 0; j < keys.size(); j++)
             {
-                std::cout << item << " ";
+                if (csvData[keys[j]].empty())
+                {
+                    csvData[keys[j]] = std::vector<std::string>();
+                }
+                csvData[keys[j]].push_back(line[j]);
             }
-            std::cout << std::endl; // Newline after each row
         }
-
-        // Close the file
-        file.close();
-
+        return csvData;
     }
 };
